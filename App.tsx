@@ -20,7 +20,7 @@ export default function App() {
 
   const medico1: Medico = {
     id: 1,
-    nome: "Dr. Roberto Silva",
+    nome: "Dra. Gerlucy Zaoldyeck",
     crm: "CRM12345",
     especialidade: cardiologia,
     ativo: true,
@@ -28,10 +28,10 @@ export default function App() {
 
   const paciente1: Paciente = {
     id: 1,
-    nome: "Carlos Andrade",
+    nome: "Samanta Uchiha",
     cpf: "123.456.789-00",
-    email: "carlos@email.com",
-    telefone: "(11) 98765-4321",
+    email: "samantauchiha11@email.com",
+    telefone: "(11) 9002-8922",
   };
 
   const [consulta, setConsulta] = useState<Consulta>({
@@ -75,7 +75,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#79059C",
+    backgroundColor: "#334997",
   },
   scrollContent: {
     padding: 20,
@@ -94,6 +94,6 @@ const styles = StyleSheet.create({
   subtitulo: {
     fontSize: 18,
     color: "#fff",
-    opacity: 0.9,
+    opacity: 0.9
   },
 });

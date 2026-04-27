@@ -56,7 +56,7 @@ export function ConsultaCard({
 
       {/* Médico */}
       <View style={styles.secao}>
-        <Text style={styles.label}>👨‍⚕️ Médico</Text>
+        <Text style={styles.label}> Médico</Text>
         <Text style={styles.valor}>{consulta.medico?.nome}</Text>
         <Text style={styles.info}>CRM: {consulta.medico?.crm}</Text>
         <Text style={styles.info}>
@@ -66,7 +66,7 @@ export function ConsultaCard({
 
       {/* Paciente */}
       <View style={styles.secao}>
-        <Text style={styles.label}>👤 Paciente</Text>
+        <Text style={styles.label}> Paciente</Text>
         <Text style={styles.valor}>{consulta.paciente?.nome}</Text>
         <Text style={styles.info}>CPF: {consulta.paciente?.cpf}</Text>
         <Text style={styles.info}>Email: {consulta.paciente?.email}</Text>
@@ -79,7 +79,7 @@ export function ConsultaCard({
 
       {/* Consulta */}
       <View style={styles.secao}>
-        <Text style={styles.label}>📅 Dados da Consulta</Text>
+        <Text style={styles.label}> Dados da Consulta</Text>
         <Text style={styles.valor}>
           Data: {formatarData(consulta.data)}
         </Text>
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#79059C",
+    color: "#05419c",
     marginBottom: 8,
   },
   valor: {
