@@ -1,99 +1,201 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from "react-native";
 import { StatusBar } from "expo-status-bar";
 
-// Tipos
-import { Especialidade } from "./src/types/especialidade";
-import { Paciente } from "./src/types/paciente";
+// Importando a modelagem TypeScript
 import { Medico } from "./src/interfaces/medico";
-import { Consulta } from "./src/interfaces/consulta";
+import { Paciente } from "./src/types/paciente";
 
-// Componente
-import { ConsultaCard } from "./src/components/ConsultaCard";
+// Importando os serviços que consomem a API real
+import { listarMedicos } from "./src/services/medicoService";
+import { listarPacientes } from "./src/services/pacienteService";
 
 export default function App() {
-  const cardiologia: Especialidade = {
-    id: 1,
-    nome: "Cardiologia",
-    descricao: "Cuidados com o coração",
-  };
+ const [medicos, setMedicos] = useState<Medico[]>([]);
+ const [pacientes, setPacientes] = useState<Paciente[]>([]);
+ const [carregando, setCarregando] = useState(true);
+ const [erro, setErro] = useState<string | null>(null);
 
-  const medico1: Medico = {
-    id: 1,
-    nome: "Dra. Gerlucy Zaoldyeck",
-    crm: "CRM12345",
-    especialidade: cardiologia,
-    ativo: true,
-  };
+ useEffect(() => {
+ carregarDados();
+ }, []);
 
-  const paciente1: Paciente = {
-    id: 1,
-    nome: "Samanta Uchiha",
-    cpf: "123.456.789-00",
-    email: "samantauchiha11@email.com",
-    telefone: "(11) 9002-8922",
-  };
+ async function carregarDados() {
+ try {
+ setCarregando(true);
+ setErro(null);
 
-  const [consulta, setConsulta] = useState<Consulta>({
-    id: 1,
-    medico: medico1,
-    paciente: paciente1,
-    data: new Date(2026, 2, 10),
-    valor: 350,
-    status: "agendada",
-    observacoes: "Consulta de rotina",
-  });
+ const [listaMedicos, listaPacientes] = await Promise.all([
+ listarMedicos(),
+ listarPacientes(),
+ ]);
 
-  function confirmarConsulta() {
-    setConsulta({ ...consulta, status: "confirmada" });
-  }
+ setMedicos(listaMedicos);
+ setPacientes(listaPacientes);
+ } catch (error) {
+ setErro(
+ "Não foi possível carregar os dados.\nVerifique se o backend está rodando em http://localhost:8080"
+ );
+ } finally {
+ setCarregando(false);
+ }
+ }
 
-  function cancelarConsulta() {
-    setConsulta({ ...consulta, status: "cancelada" });
-  }
+ return (
+ <View style={styles.container}>
+ <StatusBar style="light" />
 
-  return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
+ <FlatList
+ contentContainerStyle={styles.scrollContent}
+ data={[]}
+ renderItem={null}
+ ListHeaderComponent={
+ <>
+ {/* Cabeçalho */}
+ <View style={styles.header}>
+ <Text style={styles.titulo}>Sistema de Consultas</Text>
+ <Text style={styles.subtitulo}>Dados do Backend</Text>
+ </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.titulo}>Sistema de Consultas</Text>
-          <Text style={styles.subtitulo}>Consulta #{consulta.id}</Text>
-        </View>
+ {/* Indicador de carregamento */}
+ {carregando && (
+ <ActivityIndicator size="large" color="#fff" style={{ marginTop: 40 }} />
+ )}
 
-        <ConsultaCard
-          consulta={consulta}
-          onConfirmar={confirmarConsulta}
-          onCancelar={cancelarConsulta}
-        />
-      </ScrollView>
-    </View>
-  );
+ {/* Mensagem de erro */}
+ {erro && (
+ <View style={styles.erroContainer}>
+ <Text style={styles.erroTexto}>{erro}</Text>
+ </View>
+ )}
+
+ {/* Lista de Médicos */}
+ {!carregando && !erro && (
+ <>
+ <Text style={styles.secaoTitulo}>
+ 👨‍⚕️ Médicos ({medicos.length})
+ </Text>
+ {medicos.map((medico) => (
+ <View key={medico.id} style={styles.card}>
+ <Text style={styles.cardNome}>{medico.nome}</Text>
+ <Text style={styles.cardInfo}>CRM: {medico.crm}</Text>
+ <Text style={styles.cardInfo}>
+ {medico.especialidade?.nome ?? " - "}
+ </Text>
+ <View
+ style={[
+ styles.badge,
+ medico.ativo ? styles.badgeAtivo : styles.badgeInativo,
+ ]}
+ >
+ <Text style={styles.badgeTexto}>
+ {medico.ativo ? "Ativo" : "Inativo"}
+ </Text>
+ </View>
+ </View>
+ ))}
+
+ {/* Lista de Pacientes */}
+ <Text style={[styles.secaoTitulo, { marginTop: 24 }]}>
+ 👤 Pacientes ({pacientes.length})
+ </Text>
+ {pacientes.map((paciente) => (
+ <View key={paciente.id} style={styles.card}>
+ <Text style={styles.cardNome}>{paciente.nome}</Text>
+ <Text style={styles.cardInfo}>CPF: {paciente.cpf}</Text>
+ <Text style={styles.cardInfo}>{paciente.email}</Text>
+ {paciente.telefone && (
+ <Text style={styles.cardInfo}>Tel: {paciente.telefone}</Text>
+ )}
+ </View>
+ ))}
+ </>
+ )}
+ </>
+ }
+ />
+ </View>
+ );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#334997",
-  },
-  scrollContent: {
-    padding: 20,
-    paddingTop: 60,
-  },
-  header: {
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  titulo: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 8,
-  },
-  subtitulo: {
-    fontSize: 18,
-    color: "#fff",
-    opacity: 0.9
-  },
+ container: {
+ flex: 1,
+ backgroundColor: "#79059C",
+ },
+ scrollContent: {
+ padding: 20,
+ paddingTop: 60,
+ paddingBottom: 40,
+ },
+ header: {
+ alignItems: "center",
+ marginBottom: 24,
+ },
+ titulo: {
+ fontSize: 28,
+ fontWeight: "bold",
+ color: "#fff",
+ marginBottom: 8,
+ },
+ subtitulo: {
+ fontSize: 18,
+ color: "#fff",
+ opacity: 0.9,
+ },
+ secaoTitulo: {
+ fontSize: 18,
+ fontWeight: "bold",
+ color: "#fff",
+ marginBottom: 12,
+ },
+ card: {
+ backgroundColor: "#fff",
+ borderRadius: 12,
+ padding: 16,
+ marginBottom: 12,
+ },
+ cardNome: {
+ fontSize: 16,
+ fontWeight: "bold",
+ color: "#333",
+ marginBottom: 4,
+ },
+ cardInfo: {
+ fontSize: 14,
+ color: "#666",
+ marginBottom: 2,
+ },
+ badge: {
+ alignSelf: "flex-start",
+ borderRadius: 6,
+ paddingHorizontal: 10,
+ paddingVertical: 3,
+ marginTop: 8,
+ },
+ badgeAtivo: {
+ backgroundColor: "#d4edda",
+ },
+ badgeInativo: {
+ backgroundColor: "#f8d7da",
+ },
+ badgeTexto: {
+ fontSize: 12,
+ fontWeight: "bold",
+ color: "#333",
+ },
+ erroContainer: {
+ marginTop: 24,
+ padding: 16,
+ backgroundColor: "rgba(255, 80, 80, 0.2)",
+ borderRadius: 12,
+ borderWidth: 1,
+ borderColor: "rgba(255, 80, 80, 0.5)",
+ },
+ erroTexto: {
+ fontSize: 14,
+ color: "#fff",
+ textAlign: "center",
+ lineHeight: 22,
+ },
 });
