@@ -13,7 +13,7 @@ import {
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
 import { buscarMedicoPorCrm } from "../../services/medicoService";
-import { mensagemErroApi } from "../../utils/apiErro";
+import { isNetworkError } from "../../services/api";
 
 type Props = {
  navigation: NativeStackNavigationProp<RootStackParamList, "LoginMedico">;
@@ -45,8 +45,14 @@ export default function LoginMedicoScreen({ navigation }: Props) {
  medicoNome: medico.nome,
  });
  }
- } catch (e) {
- setErro(mensagemErroApi(e, "CRM nao encontrado. Verifique e tente novamente."));
+ } catch (error) {
+ if (isNetworkError(error)) {
+ setErro(
+ "Servidor indisponivel. Verifique se o backend esta rodando e tente novamente."
+ );
+ } else {
+ setErro("CRM nao encontrado. Verifique e tente novamente.");
+ }
  } finally {
  setCarregando(false);
  }
