@@ -6,12 +6,19 @@ export async function listarEspecialidades(): Promise<Especialidade[]> {
  return response.data;
 }
 
-export async function buscarEspecialidadePorId(id: number): Promise<Especialidade> {
+export async function buscarEspecialidadePorId(
+ id: number
+): Promise<Especialidade> {
  const response = await api.get<Especialidade>(`/especialidades/${id}`);
  return response.data;
 }
 
-export async function criarEspecialidade(especialidade: Omit<Especialidade, "id">): Promise<Especialidade> {
- const response = await api.post<Especialidade>("/especialidades", especialidade);
+export async function criarEspecialidade(
+ especialidade: Omit<Especialidade, "id">
+): Promise<Especialidade> {
+ const response = await api.post<Especialidade>(
+ "/especialidades",
+ especialidade
+ );
  return response.data;
 }

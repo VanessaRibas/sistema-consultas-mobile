@@ -2,7 +2,6 @@ import api from "./api";
 import { Consulta } from "../interfaces/consulta";
 import { StatusConsulta } from "../types/statusConsulta";
 
-
 export type NovaConsulta = {
  medicoId: number;
  pacienteId: number;
@@ -72,3 +71,4 @@ export async function listarConsultasPorPaciente(pacienteId: number): Promise<Co
  const response = await api.get<Consulta[]>(`/consultas/paciente/${pacienteId}`);
  return response.data;
 }
+
